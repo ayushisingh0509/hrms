@@ -9,11 +9,15 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import hrms.hrms.entity.JobSeeker;
+import hrms.hrms.entity.Role;
+import hrms.hrms.entity.User;
 import hrms.hrms.repository.JobSeekerDao;
+import hrms.hrms.repository.UserDao;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -23,14 +27,27 @@ public class JobSeekerDaoTest {
     @Autowired
     private JobSeekerDao jobSeekerDao;
 
+	@Autowired
+	private UserDao userDao;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    private User validUser(String email) {
+        User user = new User();
+        user.setEmail(email);
+        user.setPassword(passwordEncoder.encode("password123"));
+        user.setRole(Role.CANDIDATE);
+        return user;
+    }
+
     private JobSeeker validJobSeeker(String email, String nationalId) {
         JobSeeker js = new JobSeeker();
         js.setName("Aysu");
         js.setLastName("Ay");
         js.setNationalId(nationalId);
         js.setBirthDate(LocalDate.of(2000, 6, 6));
-        js.setEmail(email);
-        js.setPassword("password123");
+        js.setUser(userDao.save(validUser(email)));
         return js;
     }
 

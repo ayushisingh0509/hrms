@@ -1,17 +1,18 @@
 package hrms.hrms.entity;
 
-import java.sql.Date;
 import java.time.LocalDate;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Past;
@@ -52,15 +53,8 @@ public class JobSeeker {
     @Column(name = "birthDate", nullable = false)
     private LocalDate birthDate;
 
-    @NotBlank(message = "Email cannot be blank.")
-    @Email(message = "Invalid email format.")
-    @Size(max = 180, message = "Email must be at most 180 characters.")
-    @Column(name = "email", nullable = false, length = 180, unique = true)
-    private String email;
-
-    @NotBlank(message = "Password cannot be blank.")
-    @Size(min = 6, max = 100, message = "Password must be between 6 and 100 characters.")
+    @OneToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false, unique = true)
     @JsonIgnore
-    @Column(name = "password", nullable = false, length = 100)
-    private String password;
+    private User user;
 }

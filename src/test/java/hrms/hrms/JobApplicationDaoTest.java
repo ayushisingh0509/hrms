@@ -8,6 +8,7 @@ import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import hrms.hrms.entity.City;
 import hrms.hrms.entity.Employer;
@@ -16,12 +17,15 @@ import hrms.hrms.entity.JobApplication;
 import hrms.hrms.entity.JobApplicationStatus;
 import hrms.hrms.entity.JobPosition;
 import hrms.hrms.entity.JobSeeker;
+import hrms.hrms.entity.Role;
+import hrms.hrms.entity.User;
 import hrms.hrms.repository.CityDao;
 import hrms.hrms.repository.EmployerDao;
 import hrms.hrms.repository.JobAdvertisementDao;
 import hrms.hrms.repository.JobApplicationDao;
 import hrms.hrms.repository.JobPositionDao;
 import hrms.hrms.repository.JobSeekerDao;
+import hrms.hrms.repository.UserDao;
 import jakarta.transaction.Transactional;
 
 @SpringBootTest
@@ -47,13 +51,26 @@ public class JobApplicationDaoTest {
 	@Autowired
 	private EmployerDao employerDao;
 
+	@Autowired
+	private UserDao userDao;
+
+	@Autowired
+	private PasswordEncoder passwordEncoder;
+
+	private User createUser(String email, Role role) {
+		User user = new User();
+		user.setEmail(email);
+		user.setPassword(passwordEncoder.encode("123456"));
+		user.setRole(role);
+		return userDao.save(user);
+	}
+
 	private Employer createEmployer() {
 		Employer employer = new Employer();
 		employer.setCompanyName("ABC Company");
 		employer.setCompanyWebPage("https://abc.com");
-		employer.setEmail("abc@test.com");
 		employer.setPhoneNumber("5551234567");
-		employer.setPassword("123456");
+		employer.setUser(createUser("abc@test.com", Role.EMPLOYER));
 		return employerDao.save(employer);
 	}
 
@@ -82,8 +99,7 @@ public class JobApplicationDaoTest {
 	    seeker.setLastName("Ay");
 	    seeker.setNationalId("12345678901");
 	    seeker.setBirthDate(LocalDate.of(2000, 6, 6));
-	    seeker.setEmail("aysu@test.com");
-	    seeker.setPassword("123456");
+	    seeker.setUser(createUser("aysu@test.com", Role.CANDIDATE));
 
 	    return jobSeekerDao.save(seeker);
 	}

@@ -9,15 +9,19 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import hrms.hrms.entity.City;
 import hrms.hrms.entity.Employer;
 import hrms.hrms.entity.JobPosition;
+import hrms.hrms.entity.Role;
+import hrms.hrms.entity.User;
 import hrms.hrms.repository.CityDao;
 import hrms.hrms.repository.EmployerDao;
 import hrms.hrms.repository.JobPositionDao;
+import hrms.hrms.repository.UserDao;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -35,6 +39,12 @@ public class JobAdvertisementControllerTest {
 
     @Autowired
     private EmployerDao employerDao;
+
+	@Autowired
+	private UserDao userDao;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
 
     private String unique(String prefix) {
@@ -63,9 +73,12 @@ public class JobAdvertisementControllerTest {
 
         employer.setCompanyName("Company-" + id);
         employer.setCompanyWebPage("https://company" + id + ".com");
-        employer.setEmail("mail" + id + "@test.com");
         employer.setPhoneNumber("5551234567");
-        employer.setPassword("123456");
+		User user = new User();
+		user.setEmail("mail" + id + "@test.com");
+        user.setPassword(passwordEncoder.encode("123456"));
+		user.setRole(Role.EMPLOYER);
+		employer.setUser(userDao.save(user));
 
         return employerDao.save(employer);
     }

@@ -9,7 +9,7 @@ import hrms.hrms.entity.JobSeeker;
 
 public interface JobSeekerDao extends JpaRepository<JobSeeker, Integer> {
 
-    Optional<JobSeeker> findByEmail(String email);
+	Optional<JobSeeker> findByUser_Email(String email);
     Optional<JobSeeker> findByNationalId(String nationalId);
 
 }

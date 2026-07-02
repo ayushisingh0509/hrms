@@ -8,16 +8,20 @@ import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 
 import hrms.hrms.entity.City;
 import hrms.hrms.entity.Employer;
 import hrms.hrms.entity.JobAdvertisement;
 import hrms.hrms.entity.JobPosition;
+import hrms.hrms.entity.Role;
+import hrms.hrms.entity.User;
 import hrms.hrms.repository.CityDao;
 import hrms.hrms.repository.EmployerDao;
 import hrms.hrms.repository.JobAdvertisementDao;
 import hrms.hrms.repository.JobPositionDao;
+import hrms.hrms.repository.UserDao;
 import jakarta.transaction.Transactional;
 
 @SpringBootTest
@@ -37,13 +41,26 @@ public class JobAdvertisementDaoTest {
     @Autowired
     private EmployerDao employerDao;
 
+    @Autowired
+    private UserDao userDao;
+
+	@Autowired
+	private PasswordEncoder passwordEncoder;
+
+    private User createUser() {
+        User user = new User();
+        user.setEmail("abc@test.com");
+        user.setPassword(passwordEncoder.encode("123456"));
+        user.setRole(Role.EMPLOYER);
+        return userDao.save(user);
+    }
+
     private Employer createEmployer() {
         Employer employer = new Employer();
         employer.setCompanyName("ABC Company");
         employer.setCompanyWebPage("https://abc.com");
-        employer.setEmail("abc@test.com");
         employer.setPhoneNumber("5551234567");
-        employer.setPassword("123456");
+        employer.setUser(createUser());
         return employerDao.save(employer);
     }
 
